@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+option go_package = "./pb";
+import "friend.proto";
+
+service InboxService {
+    rpc GetInboxs (ListInboxsRequest) returns (stream ListInboxs);
+    rpc DeleteInbox (Inbox) returns (Empty);
+    rpc AddInbox(Inbox) returns (Inbox);
+}
+
+message Inbox {
+    string ID = 1;
+    string userID = 2;
+    string senderID = 3;
+    string inboxHash = 4;
+    string lastMsg = 5;
+    bool seen = 6;
+    int64 unSeenNumber = 7;
+    bool deleted = 8;
+}
+
+
+message ListInboxsRequest {
+  // The parent resource name, for example, "shelves/shelf1"
+  string parent = 1;
+
+  // The maximum number of items to return.
+  int32 page_size = 2;
+
+  // The next_page_token value returned from a previous List request, if any.
+  string page_token = 3;
+}
+
+message ListInboxs {
+    repeated Inbox Inboxs = 1;
+}
