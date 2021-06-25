@@ -1,25 +1,37 @@
 package db
 
 import (
-	"database/sql"
-	_ "github.com/lib/pq"
 	"log"
 
 	"github.com/arjun/chat/backend/util"
+	r "gopkg.in/rethinkdb/rethinkdb-go.v6"
 )
 
-func ConnectDatabase() (*sql.DB, error) {
+func ConnectDatabase() (*r.Session, error) {
 
 	config, err := util.LoadConfig(".")
 	if err != nil {
 		log.Fatal("cannot load config:", err)
 	}
 
-	conn, err := sql.Open(config.DBDriver, config.DBSource)
+	session, err := r.Connect(r.ConnectOpts{
+		Address: config.Host,
+
+		// todo: add some extra info
+		Database: config.DatabaseName,
+		// Username: config.UserName,
+		// Password: config.Password,
+		// InitialCap: config.InitailCap,
+		// MaxOpen: config.MaxOpen,
+		// Timeout: config.TimeOut*time.Second,
+		// ReadTimeout: config.ReadTimeOut*time.Second,
+		// WriteTimeout: config.WriteTimeOut*time.Second,
+	})
 	if err != nil {
-		log.Fatal("cannot connect to db:", err)
+		log.Fatalln(err)
 	}
 
-	return conn, nil
+	r.TableCreate(config.DatabaseName).RunWrite(session)
 
+	return session, nil
 }
